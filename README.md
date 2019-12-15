@@ -76,12 +76,12 @@ LOCAL_CFLAGS := \
 LOCAL_ARFLAGS := -rcs
 LOCAL_SRC := \
 	$(LOCAL_DIR)/Src/testlib.c
-LOCAL_EXPORTED_DIR := \
+LOCAL_EXPORTED_DIRS := \
 	$(LOCAL_DIR)/Inc
 include $(BUILD_STATIC_LIB)
 ```
 
-`LOCAL_EXPORTED_DIR` is used to define the exported headers for the library. These are the ones that will get included when building binaries that link against this library.
+`LOCAL_EXPORTED_DIRS` is used to define the exported headers for the library. These are the ones that will get included when building binaries that link against this library. More than one origin can be specified, but no two files with the same name shall be found.
 
 ### Known limitations
 
