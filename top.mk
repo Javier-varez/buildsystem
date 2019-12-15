@@ -9,6 +9,9 @@ BUILD_SHARED_LIB        := $(BUILD_SYSTEM_DIR)/build_shared_lib.mk
 BUILD_STATIC_LIB        := $(BUILD_SYSTEM_DIR)/build_static_lib.mk
 CLEAR_VARS              := $(BUILD_SYSTEM_DIR)/clear_vars.mk
 
+GREEN_BOLD_COLOR        := \e[32;1m
+RESET_COLOR             := \e[39;0m
+
 include $(BUILD_SYSTEM_DIR)/definitions.mk
 
 SILENT                  := @

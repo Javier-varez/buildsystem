@@ -24,7 +24,7 @@ $(LOCAL_INTERMEDIATES)/%.o: INTERNAL_TARGET_NAME := $(LOCAL_NAME)
 $(LOCAL_INTERMEDIATES)/%.o: INTERNAL_CC := $(LOCAL_CC)
 $(LOCAL_INTERMEDIATES)/%.o: INTERNAL_CFLAGS := $(LOCAL_CFLAGS)
 $(LOCAL_INTERMEDIATES)/%.o: %.c
-	$(ECHO) "[$(INTERNAL_TARGET_NAME)] CC $(notdir $<)"
+	$(call print-build-header, $(INTERNAL_TARGET_NAME), CC $(notdir $<))
 	$(MKDIR) $(dir $@)
 	$(INTERNAL_CC) -c $(INTERNAL_CFLAGS) -o $@ $< -MMD
 
@@ -32,7 +32,7 @@ $(LOCAL_INTERMEDIATES)/%.o: INTERNAL_TARGET_NAME := $(LOCAL_NAME)
 $(LOCAL_INTERMEDIATES)/%.o: INTERNAL_CXX := $(LOCAL_CXX)
 $(LOCAL_INTERMEDIATES)/%.o: INTERNAL_CXXFLAGS := $(LOCAL_CXXFLAGS)
 $(LOCAL_INTERMEDIATES)/%.o: %.cpp
-	$(ECHO) "[$(INTERNAL_TARGET_NAME)] CXX $(notdir $<)"
+	$(call print-build-header, $(INTERNAL_TARGET_NAME), CXX $(notdir $<))
 	$(MKDIR) $(dir $@)
 	$(INTERNAL_CXX) -c $(INTERNAL_CXXFLAGS) -o $@ $< -MMD
 
@@ -40,7 +40,7 @@ $(LOCAL_INTERMEDIATES)/%.o: INTERNAL_TARGET_NAME := $(LOCAL_NAME)
 $(LOCAL_INTERMEDIATES)/%.o: INTERNAL_AS := $(LOCAL_AS)
 $(LOCAL_INTERMEDIATES)/%.o: INTERNAL_ASFLAGS := $(LOCAL_ASFLAGS)
 $(LOCAL_INTERMEDIATES)/%.o: %.s
-	$(ECHO) "[$(INTERNAL_TARGET_NAME)] AS $(notdir $<)"
+	$(call print-build-header, $(INTERNAL_TARGET_NAME), AS $(notdir $<))
 	$(MKDIR) $(dir $@)
 	$(INTERNAL_AS) -c $(INTERNAL_ASFLAGS) -o $@ $< -MMD
 
@@ -49,13 +49,13 @@ $(LOCAL_TARGET): INTERNAL_AR := $(LOCAL_AR)
 $(LOCAL_TARGET): INTERNAL_ARFLAGS := $(LOCAL_ARFLAGS)
 $(LOCAL_TARGET): INTERNAL_OBJ := $(LOCAL_OBJ)
 $(LOCAL_TARGET): $(LOCAL_OBJ) $(LOCAL_TARGET_EXPORTS)
-	$(ECHO) "[$(INTERNAL_TARGET_NAME)] AR"
+	$(call print-build-header, $(INTERNAL_TARGET_NAME), AR)
 	$(MKDIR) $(dir $@)
 	$(INTERNAL_AR) $(INTERNAL_ARFLAGS) $@ $(INTERNAL_OBJ)
 
 $(LOCAL_TARGET_EXPORT_DIR)/%.h: INTERNAL_TARGET_NAME := $(LOCAL_NAME)
 $(LOCAL_TARGET_EXPORT_DIR)/%.h:
-	$(ECHO) "[$(INTERNAL_TARGET_NAME)] EXPORT $(notdir $@)"
+	$(call print-build-header, $(INTERNAL_TARGET_NAME), EXPORT $(notdir $@))
 	$(MKDIR) $(dir $@)
 	$(SILENT) # Find origin file from $(LOCAL_EXPORTED_DIRS) and make sure that only 1 matches
 	$(eval INCFILE := $(wildcard $(addsuffix /$(notdir $@), $(LOCAL_EXPORTED_DIRS))))
