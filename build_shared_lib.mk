@@ -53,11 +53,12 @@ $(LOCAL_TARGET): $(LOCAL_OBJ) $(LOCAL_TARGET_EXPORTS)
 	$(INTERNAL_CC) -shared -o $@ $(INTERNAL_OBJ) $(INTERNAL_LDFLAGS)
 
 $(LOCAL_TARGET_EXPORT_DIR)/%.h: INTERNAL_TARGET_NAME := $(LOCAL_NAME)
+$(LOCAL_TARGET_EXPORT_DIR)/%.h: INTERNAL_EXPORTED_DIRS := $(LOCAL_EXPORTED_DIRS)
 $(LOCAL_TARGET_EXPORT_DIR)/%.h:
 	$(call print-build-header, $(INTERNAL_TARGET_NAME), EXPORT $(notdir $@))
 	$(MKDIR) $(dir $@)
-	$(SILENT) # Find origin file from $(LOCAL_EXPORTED_DIRS) and make sure that only 1 matches
-	$(eval INCFILE := $(wildcard $(addsuffix /$(notdir $@), $(LOCAL_EXPORTED_DIRS))))
+	$(SILENT) # Find origin file from $(INTERNAL_EXPORTED_DIRS) and make sure that only 1 matches
+	$(eval INCFILE := $(wildcard $(addsuffix /$(notdir $@), $(INTERNAL_EXPORTED_DIRS))))
 	$(if $(filter-out 1, $(words $(INCFILE))), $(error more than one origin file found: $(INCFILE)))
 	$(CP) $(INCFILE) $@
 	$(SILENT) # Generate dependency file
