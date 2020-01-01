@@ -26,6 +26,10 @@ LOCAL_LDFLAGS           += $(addprefix -L, $(dir $(LOCAL_SHARED_LIB_PATHS) $(LOC
 			   $(addprefix -l, $(patsubst lib%.so, %, $(notdir $(LOCAL_SHARED_LIB_PATHS)))) \
 			   $(addprefix -l, $(patsubst lib%.a, %, $(notdir $(LOCAL_STATIC_LIB_PATHS))))
 
+ifneq ($(SKIP_MAP_GEN),true)
+LOCAL_LDFLAGS           += -Wl,-Map=$(LOCAL_TARGET).map
+endif
+
 $(LOCAL_INTERMEDIATES)/%.o: INTERNAL_TARGET_NAME := $(LOCAL_NAME)
 $(LOCAL_INTERMEDIATES)/%.o: INTERNAL_CC := $(LOCAL_CC)
 $(LOCAL_INTERMEDIATES)/%.o: INTERNAL_CFLAGS := $(LOCAL_CFLAGS)
@@ -57,7 +61,7 @@ $(LOCAL_TARGET): INTERNAL_TARGET_NAME := $(LOCAL_NAME)
 $(LOCAL_TARGET): $(LOCAL_OBJ) $(LOCAL_SHARED_LIB_PATHS) $(LOCAL_STATIC_LIB_PATHS)
 	$(call print-build-header, $(INTERNAL_TARGET_NAME), LD)
 	$(MKDIR) $(dir $@)
-	$(INTERNAL_CC) $(INTERNAL_CFLAGS) -o $@ $(filter-out %.so %.a, $^) $(INTERNAL_LDFLAGS) -Wl,-Map=$@.map
+	$(INTERNAL_CC) $(INTERNAL_CFLAGS) -o $@ $(filter-out %.so %.a, $^) $(INTERNAL_LDFLAGS)
 
 $(LOCAL_NAME): $(LOCAL_TARGET)
 .PHONY: $(LOCAL_NAME)
