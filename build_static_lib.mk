@@ -18,7 +18,8 @@ LOCAL_LD                := $(SILENT)$(LOCAL_CROSS_COMPILE)$(LD)
 LOCAL_AS                := $(SILENT)$(LOCAL_CROSS_COMPILE)$(AS)
 LOCAL_AR                := $(SILENT)$(LOCAL_CROSS_COMPILE)$(AR)
 LOCAL_TARGET_EXPORT_DIR := $(LOCAL_OUT_DIR)/exports
-LOCAL_TARGET_EXPORTS    := $(addprefix $(LOCAL_TARGET_EXPORT_DIR)/, $(notdir $(wildcard $(addsuffix /*.h, $(LOCAL_EXPORTED_DIRS)))))
+LOCAL_TARGET_EXPORTS    := $(addprefix $(LOCAL_TARGET_EXPORT_DIR)/, \
+	$(foreach EXPORTED_DIR,$(LOCAL_EXPORTED_DIRS),$(subst $(EXPORTED_DIR),,$(shell find $(EXPORTED_DIR) -name *.h))))
 LOCAL_SHARED_LIB_PATHS  := $(foreach lib, $(LOCAL_SHARED_LIBS), $(BUILD_LIBS_DIR)/$(lib)/$(lib).so)
 LOCAL_SHARED_LIB_INCS   := $(foreach lib, $(LOCAL_SHARED_LIBS), $(BUILD_LIBS_DIR)/$(lib)/exports)
 LOCAL_STATIC_LIB_PATHS  := $(foreach lib, $(LOCAL_STATIC_LIBS), $(BUILD_LIBS_DIR)/$(lib)/$(lib).a)
@@ -62,10 +63,10 @@ $(LOCAL_TARGET): $(LOCAL_OBJ) $(LOCAL_STATIC_LIB_PATHS) $(LOCAL_SHARED_LIB_PATHS
 $(LOCAL_TARGET_EXPORT_DIR)/%.h: INTERNAL_TARGET_NAME := $(LOCAL_NAME)
 $(LOCAL_TARGET_EXPORT_DIR)/%.h: INTERNAL_EXPORTED_DIRS := $(LOCAL_EXPORTED_DIRS)
 $(LOCAL_TARGET_EXPORT_DIR)/%.h:
-	$(call print-build-header, $(INTERNAL_TARGET_NAME), EXPORT $(notdir $@))
+	$(call print-build-header, $(INTERNAL_TARGET_NAME), EXPORT $@)
 	$(MKDIR) $(dir $@)
 	$(SILENT) # Find origin file from $(INTERNAL_EXPORTED_DIRS) and make sure that only 1 matches
-	$(eval INCFILE := $(wildcard $(addsuffix /$(notdir $@), $(INTERNAL_EXPORTED_DIRS))))
+	$(eval INCFILE := $(shell find $(INTERNAL_EXPORTED_DIRS) -name $(notdir $@)))
 	$(if $(filter-out 1, $(words $(INCFILE))), $(error more than one origin file found: $(INCFILE)))
 	$(CP) $(INCFILE) $@
 	$(SILENT) # Generate dependency file
