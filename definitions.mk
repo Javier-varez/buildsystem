@@ -1,5 +1,5 @@
 define current-dir
-$(dir $(lastword $(MAKEFILE_LIST)))
+$(patsubst %/, %, $(dir $(lastword $(MAKEFILE_LIST))))
 endef
 
 define all-makefiles-under

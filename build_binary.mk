@@ -23,7 +23,7 @@ LOCAL_STATIC_LIB_PATHS  := $(foreach lib, $(LOCAL_STATIC_LIBS), $(BUILD_LIBS_DIR
 LOCAL_STATIC_LIB_INCS   := $(foreach lib, $(LOCAL_STATIC_LIBS), $(BUILD_LIBS_DIR)/$(lib)/exports)
 LOCAL_CFLAGS            += $(addprefix -I, $(LOCAL_SHARED_LIB_INCS) $(LOCAL_STATIC_LIB_INCS))
 LOCAL_CXXFLAGS          += $(addprefix -I, $(LOCAL_SHARED_LIB_INCS) $(LOCAL_STATIC_LIB_INCS))
-LOCAL_LDFLAGS           += $(addprefix -L, $(dir $(LOCAL_SHARED_LIB_PATHS) $(LOCAL_STATIC_LIB_PATHS))) \
+LOCAL_LDFLAGS           += $(addprefix -L, $(patsubst %/, %, $(dir $(LOCAL_SHARED_LIB_PATHS) $(LOCAL_STATIC_LIB_PATHS)))) \
 			   $(addprefix -l, $(patsubst lib%.so, %, $(notdir $(LOCAL_SHARED_LIB_PATHS)))) \
 			   $(addprefix -l, $(patsubst lib%.a, %, $(notdir $(LOCAL_STATIC_LIB_PATHS))))
 
