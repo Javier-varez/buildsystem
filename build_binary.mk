@@ -3,10 +3,11 @@ LOCAL_TARGET            := $(BUILD_TARGET_DIR)/$(LOCAL_NAME)
 LOCAL_INTERMEDIATES     := $(BUILD_INTERMEDIATES_DIR)/$(LOCAL_NAME)
 LOCAL_LDFLAGS           += $(addprefix -T, $(LOCAL_LINKER_FILE))
 LOCAL_C_SRC             := $(filter %.c, $(LOCAL_SRC))
-LOCAL_CXX_SRC           := $(filter %.cpp, $(LOCAL_SRC))
+LOCAL_CXX_SRC           := $(filter %.cpp %.cc, $(LOCAL_SRC))
 LOCAL_S_SRC             := $(filter %.s, $(LOCAL_SRC))
 LOCAL_C_OBJ             := $(addprefix $(LOCAL_INTERMEDIATES)/, $(patsubst %.c, %.o, $(LOCAL_C_SRC)))
-LOCAL_CXX_OBJ           := $(addprefix $(LOCAL_INTERMEDIATES)/, $(patsubst %.cpp, %.o, $(LOCAL_CXX_SRC)))
+LOCAL_CXX_OBJ           := $(addprefix $(LOCAL_INTERMEDIATES)/, $(patsubst %.cpp, %.o, $(filter %.cpp, $(LOCAL_CXX_SRC))))
+LOCAL_CXX_OBJ           += $(addprefix $(LOCAL_INTERMEDIATES)/, $(patsubst %.cc, %.o, $(filter %.cc, $(LOCAL_CXX_SRC))))
 LOCAL_S_OBJ             := $(addprefix $(LOCAL_INTERMEDIATES)/, $(patsubst %.s, %.o, $(LOCAL_S_SRC)))
 LOCAL_OBJ               := $(LOCAL_C_OBJ) \
                            $(LOCAL_CXX_OBJ) \
@@ -43,6 +44,14 @@ $(LOCAL_INTERMEDIATES)/%.o: INTERNAL_TARGET_NAME := $(LOCAL_NAME)
 $(LOCAL_INTERMEDIATES)/%.o: INTERNAL_CXX := $(LOCAL_CXX)
 $(LOCAL_INTERMEDIATES)/%.o: INTERNAL_CXXFLAGS := $(LOCAL_CXXFLAGS)
 $(LOCAL_INTERMEDIATES)/%.o: %.cpp $(LOCAL_SHARED_LIB_PATHS) $(LOCAL_STATIC_LIB_PATHS) $(CURRENT_MK) $(LOCAL_DIR)/build.mk
+	$(call print-build-header, $(INTERNAL_TARGET_NAME), CXX $(notdir $<))
+	$(MKDIR) $(dir $@)
+	$(INTERNAL_CXX) -c $(INTERNAL_CXXFLAGS) -o $@ $< -MMD
+
+$(LOCAL_INTERMEDIATES)/%.o: INTERNAL_TARGET_NAME := $(LOCAL_NAME)
+$(LOCAL_INTERMEDIATES)/%.o: INTERNAL_CXX := $(LOCAL_CXX)
+$(LOCAL_INTERMEDIATES)/%.o: INTERNAL_CXXFLAGS := $(LOCAL_CXXFLAGS)
+$(LOCAL_INTERMEDIATES)/%.o: %.cc $(LOCAL_SHARED_LIB_PATHS) $(LOCAL_STATIC_LIB_PATHS) $(CURRENT_MK) $(LOCAL_DIR)/build.mk
 	$(call print-build-header, $(INTERNAL_TARGET_NAME), CXX $(notdir $<))
 	$(MKDIR) $(dir $@)
 	$(INTERNAL_CXX) -c $(INTERNAL_CXXFLAGS) -o $@ $< -MMD
