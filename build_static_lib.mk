@@ -19,39 +19,45 @@ LOCAL_CXX               := $(SILENT)$(LOCAL_CROSS_COMPILE)$(CXX)
 LOCAL_LD                := $(SILENT)$(LOCAL_CROSS_COMPILE)$(LD)
 LOCAL_AS                := $(SILENT)$(LOCAL_CROSS_COMPILE)$(AS)
 LOCAL_AR                := $(SILENT)$(LOCAL_CROSS_COMPILE)$(AR)
+LOCAL_EXPORTS           := $(foreach EXPORTED_DIR, $(LOCAL_EXPORTED_DIRS), $(shell find $(EXPORTED_DIR) -name "*.h"))
 LOCAL_TARGET_EXPORT_DIR := $(LOCAL_OUT_DIR)/exports
-LOCAL_TARGET_EXPORTS    := $(addprefix $(LOCAL_TARGET_EXPORT_DIR)/, \
-	$(foreach EXPORTED_DIR,$(LOCAL_EXPORTED_DIRS),$(subst $(EXPORTED_DIR),,$(shell find $(EXPORTED_DIR) -name *.h))))
+LOCAL_TARGET_EXPORTS    := $(addprefix $(LOCAL_TARGET_EXPORT_DIR)/, $(LOCAL_EXPORTS))
 LOCAL_SHARED_LIB_PATHS  := $(foreach lib, $(LOCAL_SHARED_LIBS), $(BUILD_LIBS_DIR)/$(lib)/$(lib).so)
-LOCAL_SHARED_LIB_INCS   := $(foreach lib, $(LOCAL_SHARED_LIBS), $(BUILD_LIBS_DIR)/$(lib)/exports)
 LOCAL_STATIC_LIB_PATHS  := $(foreach lib, $(LOCAL_STATIC_LIBS), $(BUILD_LIBS_DIR)/$(lib)/$(lib).a)
-LOCAL_STATIC_LIB_INCS   := $(foreach lib, $(LOCAL_STATIC_LIBS), $(BUILD_LIBS_DIR)/$(lib)/exports)
-LOCAL_CFLAGS            += $(addprefix -I, $(LOCAL_SHARED_LIB_INCS) $(LOCAL_STATIC_LIB_INCS))
-LOCAL_CXXFLAGS          += $(addprefix -I, $(LOCAL_SHARED_LIB_INCS) $(LOCAL_STATIC_LIB_INCS))
+LOCAL_LIBS              := $(LOCAL_SHARED_LIBS) $(LOCAL_STATIC_LIBS)
+
+# We define the exported include directories for other targets that may use them
+TARGET_$(LOCAL_NAME)_EXPORT_DIRS := $(addprefix $(LOCAL_TARGET_EXPORT_DIR)/, $(LOCAL_EXPORTED_DIRS))
 
 $(LOCAL_INTERMEDIATES)/%.o: INTERNAL_TARGET_NAME := $(LOCAL_NAME)
 $(LOCAL_INTERMEDIATES)/%.o: INTERNAL_CC := $(LOCAL_CC)
 $(LOCAL_INTERMEDIATES)/%.o: INTERNAL_CFLAGS := $(LOCAL_CFLAGS)
+$(LOCAL_INTERMEDIATES)/%.o: INTERNAL_LIBS := $(LOCAL_LIBS)
 $(LOCAL_INTERMEDIATES)/%.o: %.c $(LOCAL_SHARED_LIB_PATHS) $(LOCAL_STATIC_LIB_PATHS) $(CURRENT_MK) $(LOCAL_DIR)/build.mk
 	$(call print-build-header, $(INTERNAL_TARGET_NAME), CC $(notdir $<))
 	$(MKDIR) $(dir $@)
-	$(INTERNAL_CC) -c $(INTERNAL_CFLAGS) -o $@ $< -MMD
+	$(eval LIB_INCLUDE_DIRS := $(call get-include-exports-for-libs, $(INTERNAL_LIBS)))
+	$(INTERNAL_CC) -c $(INTERNAL_CFLAGS) $(LIB_INCLUDE_DIRS) -o $@ $< -MMD
 
 $(LOCAL_INTERMEDIATES)/%.o: INTERNAL_TARGET_NAME := $(LOCAL_NAME)
 $(LOCAL_INTERMEDIATES)/%.o: INTERNAL_CXX := $(LOCAL_CXX)
 $(LOCAL_INTERMEDIATES)/%.o: INTERNAL_CXXFLAGS := $(LOCAL_CXXFLAGS)
+$(LOCAL_INTERMEDIATES)/%.o: INTERNAL_LIBS := $(LOCAL_LIBS)
 $(LOCAL_INTERMEDIATES)/%.o: %.cpp $(LOCAL_SHARED_LIB_PATHS) $(LOCAL_STATIC_LIB_PATHS) $(CURRENT_MK) $(LOCAL_DIR)/build.mk
 	$(call print-build-header, $(INTERNAL_TARGET_NAME), CXX $(notdir $<))
 	$(MKDIR) $(dir $@)
-	$(INTERNAL_CXX) -c $(INTERNAL_CXXFLAGS) -o $@ $< -MMD
+	$(eval LIB_INCLUDE_DIRS := $(call get-include-exports-for-libs, $(INTERNAL_LIBS)))
+	$(INTERNAL_CXX) -c $(INTERNAL_CXXFLAGS) $(LIB_INCLUDE_DIRS) -o $@ $< -MMD
 
 $(LOCAL_INTERMEDIATES)/%.o: INTERNAL_TARGET_NAME := $(LOCAL_NAME)
 $(LOCAL_INTERMEDIATES)/%.o: INTERNAL_CXX := $(LOCAL_CXX)
 $(LOCAL_INTERMEDIATES)/%.o: INTERNAL_CXXFLAGS := $(LOCAL_CXXFLAGS)
+$(LOCAL_INTERMEDIATES)/%.o: INTERNAL_LIBS := $(LOCAL_LIBS)
 $(LOCAL_INTERMEDIATES)/%.o: %.cc $(LOCAL_SHARED_LIB_PATHS) $(LOCAL_STATIC_LIB_PATHS) $(CURRENT_MK) $(LOCAL_DIR)/build.mk
 	$(call print-build-header, $(INTERNAL_TARGET_NAME), CXX $(notdir $<))
 	$(MKDIR) $(dir $@)
-	$(INTERNAL_CXX) -c $(INTERNAL_CXXFLAGS) -o $@ $< -MMD
+	$(eval LIB_INCLUDE_DIRS := $(call get-include-exports-for-libs, $(INTERNAL_LIBS)))
+	$(INTERNAL_CXX) -c $(INTERNAL_CXXFLAGS) $(LIB_INCLUDE_DIRS) -o $@ $< -MMD
 
 $(LOCAL_INTERMEDIATES)/%.o: INTERNAL_TARGET_NAME := $(LOCAL_NAME)
 $(LOCAL_INTERMEDIATES)/%.o: INTERNAL_AS := $(LOCAL_AS)
@@ -72,13 +78,11 @@ $(LOCAL_TARGET): $(LOCAL_OBJ) $(LOCAL_STATIC_LIB_PATHS) $(LOCAL_SHARED_LIB_PATHS
 
 $(LOCAL_TARGET_EXPORT_DIR)/%.h: INTERNAL_TARGET_NAME := $(LOCAL_NAME)
 $(LOCAL_TARGET_EXPORT_DIR)/%.h: INTERNAL_EXPORTED_DIRS := $(LOCAL_EXPORTED_DIRS)
-$(LOCAL_TARGET_EXPORT_DIR)/%.h: $(CURRENT_MK) $(LOCAL_DIR)/build.mk
-	$(call print-build-header, $(INTERNAL_TARGET_NAME), EXPORT $@)
+$(LOCAL_TARGET_EXPORT_DIR)/%.h: INTERNAL_TARGET_EXPORT_DIR := $(LOCAL_TARGET_EXPORT_DIR)
+$(LOCAL_TARGET_EXPORT_DIR)/%.h: %.h $(CURRENT_MK) $(LOCAL_DIR)/build.mk
+	$(call print-build-header, $(INTERNAL_TARGET_NAME), EXPORT $(patsubst $(INTERNAL_TARGET_EXPORT_DIR)/%h, %h, $@))
 	$(MKDIR) $(dir $@)
-	$(SILENT) # Find origin file from $(INTERNAL_EXPORTED_DIRS) and make sure that only 1 matches
-	$(eval INCFILE := $(shell find $(INTERNAL_EXPORTED_DIRS) -name $(notdir $@)))
-	$(if $(filter-out 1, $(words $(INCFILE))), $(error more than one origin file found: $(INCFILE)))
-	$(CP) $(INCFILE) $@
+	$(CP) $< $@
 	$(SILENT) # Generate dependency file
 	$(ECHO) "$@: $(INCFILE)" > $(patsubst %.h, %.d, $@)
 

@@ -19,14 +19,12 @@ LOCAL_AS                := $(SILENT)$(LOCAL_CROSS_COMPILE)$(AS)
 
 # Link libraries
 LOCAL_SHARED_LIB_PATHS  := $(foreach lib, $(LOCAL_SHARED_LIBS), $(BUILD_LIBS_DIR)/$(lib)/$(lib).so)
-LOCAL_SHARED_LIB_INCS   := $(foreach lib, $(LOCAL_SHARED_LIBS), $(BUILD_LIBS_DIR)/$(lib)/exports)
 LOCAL_STATIC_LIB_PATHS  := $(foreach lib, $(LOCAL_STATIC_LIBS), $(BUILD_LIBS_DIR)/$(lib)/$(lib).a)
-LOCAL_STATIC_LIB_INCS   := $(foreach lib, $(LOCAL_STATIC_LIBS), $(BUILD_LIBS_DIR)/$(lib)/exports)
-LOCAL_CFLAGS            += $(addprefix -I, $(LOCAL_SHARED_LIB_INCS) $(LOCAL_STATIC_LIB_INCS))
-LOCAL_CXXFLAGS          += $(addprefix -I, $(LOCAL_SHARED_LIB_INCS) $(LOCAL_STATIC_LIB_INCS))
+LOCAL_LIBS              := $(LOCAL_SHARED_LIBS) $(LOCAL_STATIC_LIBS)
 LOCAL_LDFLAGS           := $(addprefix -L, $(patsubst %/, %, $(dir $(LOCAL_SHARED_LIB_PATHS) $(LOCAL_STATIC_LIB_PATHS)))) \
+			   $(addprefix -l, $(patsubst lib%.a, %, $(notdir $(LOCAL_STATIC_LIB_PATHS)))) \
 			   $(addprefix -l, $(patsubst lib%.so, %, $(notdir $(LOCAL_SHARED_LIB_PATHS)))) \
-			   $(addprefix -l, $(patsubst lib%.a, %, $(notdir $(LOCAL_STATIC_LIB_PATHS)))) $(LOCAL_LDFLAGS)
+			   $(LOCAL_LDFLAGS)
 
 ifneq ($(SKIP_MAP_GEN),true)
 LOCAL_LDFLAGS           += -Wl,-Map=$(LOCAL_TARGET).map
@@ -35,26 +33,32 @@ endif
 $(LOCAL_INTERMEDIATES)/%.o: INTERNAL_TARGET_NAME := $(LOCAL_NAME)
 $(LOCAL_INTERMEDIATES)/%.o: INTERNAL_CC := $(LOCAL_CC)
 $(LOCAL_INTERMEDIATES)/%.o: INTERNAL_CFLAGS := $(LOCAL_CFLAGS)
+$(LOCAL_INTERMEDIATES)/%.o: INTERNAL_LIBS := $(LOCAL_LIBS)
 $(LOCAL_INTERMEDIATES)/%.o: %.c $(LOCAL_SHARED_LIB_PATHS) $(LOCAL_STATIC_LIB_PATHS) $(CURRENT_MK) $(LOCAL_DIR)/build.mk
 	$(call print-build-header, $(INTERNAL_TARGET_NAME), CC $(notdir $<))
 	$(MKDIR) $(dir $@)
-	$(INTERNAL_CC) -c $(INTERNAL_CFLAGS) -o $@ $< -MMD
+	$(eval LIB_INCLUDE_DIRS := $(call get-include-exports-for-libs, $(INTERNAL_LIBS)))
+	$(INTERNAL_CC) -c $(INTERNAL_CFLAGS) $(LIB_INCLUDE_DIRS) -o $@ $< -MMD
 
 $(LOCAL_INTERMEDIATES)/%.o: INTERNAL_TARGET_NAME := $(LOCAL_NAME)
 $(LOCAL_INTERMEDIATES)/%.o: INTERNAL_CXX := $(LOCAL_CXX)
 $(LOCAL_INTERMEDIATES)/%.o: INTERNAL_CXXFLAGS := $(LOCAL_CXXFLAGS)
+$(LOCAL_INTERMEDIATES)/%.o: INTERNAL_LIBS := $(LOCAL_LIBS)
 $(LOCAL_INTERMEDIATES)/%.o: %.cpp $(LOCAL_SHARED_LIB_PATHS) $(LOCAL_STATIC_LIB_PATHS) $(CURRENT_MK) $(LOCAL_DIR)/build.mk
 	$(call print-build-header, $(INTERNAL_TARGET_NAME), CXX $(notdir $<))
 	$(MKDIR) $(dir $@)
-	$(INTERNAL_CXX) -c $(INTERNAL_CXXFLAGS) -o $@ $< -MMD
+	$(eval LIB_INCLUDE_DIRS := $(call get-include-exports-for-libs, $(INTERNAL_LIBS)))
+	$(INTERNAL_CXX) -c $(INTERNAL_CXXFLAGS) $(LIB_INCLUDE_DIRS) -o $@ $< -MMD
 
 $(LOCAL_INTERMEDIATES)/%.o: INTERNAL_TARGET_NAME := $(LOCAL_NAME)
 $(LOCAL_INTERMEDIATES)/%.o: INTERNAL_CXX := $(LOCAL_CXX)
 $(LOCAL_INTERMEDIATES)/%.o: INTERNAL_CXXFLAGS := $(LOCAL_CXXFLAGS)
+$(LOCAL_INTERMEDIATES)/%.o: INTERNAL_LIBS := $(LOCAL_LIBS)
 $(LOCAL_INTERMEDIATES)/%.o: %.cc $(LOCAL_SHARED_LIB_PATHS) $(LOCAL_STATIC_LIB_PATHS) $(CURRENT_MK) $(LOCAL_DIR)/build.mk
 	$(call print-build-header, $(INTERNAL_TARGET_NAME), CXX $(notdir $<))
 	$(MKDIR) $(dir $@)
-	$(INTERNAL_CXX) -c $(INTERNAL_CXXFLAGS) -o $@ $< -MMD
+	$(eval LIB_INCLUDE_DIRS := $(call get-include-exports-for-libs, $(INTERNAL_LIBS)))
+	$(INTERNAL_CXX) -c $(INTERNAL_CXXFLAGS) $(LIB_INCLUDE_DIRS) -o $@ $< -MMD
 
 $(LOCAL_INTERMEDIATES)/%.o: INTERNAL_TARGET_NAME := $(LOCAL_NAME)
 $(LOCAL_INTERMEDIATES)/%.o: INTERNAL_AS := $(LOCAL_AS)

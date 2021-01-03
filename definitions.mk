@@ -13,3 +13,7 @@ endef
 define print-build-header
 $(ECHO) $(call get-build-header, $(1), $(2))
 endef
+
+define get-include-exports-for-libs
+$(foreach LIB_TARGET_NAME, $(1), $(addprefix -I, $(TARGET_$(LIB_TARGET_NAME)_EXPORT_DIRS)))
+endef

@@ -14,7 +14,7 @@ RESET_COLOR             := \e[39;0m
 
 include $(BUILD_SYSTEM_DIR)/definitions.mk
 
-SILENT                  := @
+SILENT                  ?= @
 MKDIR                   := $(SILENT)mkdir -p
 ECHO                    := $(SILENT)echo
 RM                      := $(SILENT)rm
