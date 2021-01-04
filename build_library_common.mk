@@ -3,7 +3,7 @@ CURRENT_MK              += $(lastword $(MAKEFILE_LIST))
 include $(BUILD_SYSTEM_DIR)/build_binary_common.mk
 
 LOCAL_EXPORTS           := $(foreach EXPORTED_DIR, $(LOCAL_EXPORTED_DIRS), $(shell find $(EXPORTED_DIR) -name "*.h"))
-LOCAL_TARGET_EXPORT_DIR := $(LOCAL_OUT_DIR)/exports
+LOCAL_TARGET_EXPORT_DIR := $(BUILD_LIBS_DIR)/exports/$(LOCAL_NAME)
 LOCAL_TARGET_EXPORTS    := $(addprefix $(LOCAL_TARGET_EXPORT_DIR)/, $(LOCAL_EXPORTS))
 
 $(LOCAL_TARGET_EXPORT_DIR)/%.h: INTERNAL_TARGET_NAME := $(LOCAL_NAME)
