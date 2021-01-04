@@ -19,6 +19,6 @@ jobs:
       run: make -C test/ -j
     - name: run_binary
       run: ./test/build/targets/test_binary
-      env: 
-        LD_LIBRARY_PATH: "test/build/lib/libtest_shared:test/build/lib/libtest_nested_shared"
+      env:
+        LD_LIBRARY_PATH: "test/build/lib"
 

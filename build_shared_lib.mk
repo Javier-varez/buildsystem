@@ -1,7 +1,7 @@
 CURRENT_MK              := $(lastword $(MAKEFILE_LIST))
 LOCAL_NAME              := $(addprefix lib, $(LOCAL_NAME))
 LOCAL_OUT_DIR           := $(BUILD_LIBS_DIR)/$(LOCAL_NAME)
-LOCAL_TARGET            := $(LOCAL_OUT_DIR)/$(LOCAL_NAME).so
+LOCAL_TARGET            := $(BUILD_LIBS_DIR)/$(LOCAL_NAME).so
 
 include $(BUILD_SYSTEM_DIR)/build_library_common.mk
 
