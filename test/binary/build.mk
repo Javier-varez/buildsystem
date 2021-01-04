@@ -1,5 +1,6 @@
 LOCAL_DIR := $(call current-dir)
 
+
 include $(CLEAR_VARS)
 LOCAL_NAME := test_binary
 LOCAL_CFLAGS := \
