@@ -19,9 +19,18 @@ LOCAL_OBJ               := $(LOCAL_C_OBJ) \
 # Toolchain binaries
 LOCAL_CC                := $(SILENT)$(LOCAL_CROSS_COMPILE)$(CC)
 LOCAL_CXX               := $(SILENT)$(LOCAL_CROSS_COMPILE)$(CXX)
-LOCAL_LD                := $(SILENT)$(LOCAL_CROSS_COMPILE)$(LD)
 LOCAL_AS                := $(SILENT)$(LOCAL_CROSS_COMPILE)$(AS)
 LOCAL_AR                := $(SILENT)$(LOCAL_CROSS_COMPILE)$(AR)
+
+ifneq ($(findstring clang, $(LOCAL_CC)), )
+ALL_DB_FILES += $(patsubst %.o, %.db, $(LOCAL_C_OBJ))
+$(BUILD_COMP_DB_FILE): $(LOCAL_TARGET)
+endif
+
+ifneq ($(findstring clang, $(LOCAL_CXX)), )
+ALL_DB_FILES += $(patsubst %.o, %.db, $(LOCAL_CXX_OBJ))
+$(BUILD_COMP_DB_FILE): $(LOCAL_TARGET)
+endif
 
 # Library sources
 LOCAL_SHARED_LIB_PATHS  := $(foreach lib, $(LOCAL_SHARED_LIBS), $(BUILD_LIBS_DIR)/$(lib).so)
@@ -40,8 +49,9 @@ $(LOCAL_INTERMEDIATES)/%.o: INTERNAL_LIBS := $(LOCAL_LIBS)
 $(LOCAL_INTERMEDIATES)/%.o: %.c $(LOCAL_SHARED_LIB_PATHS) $(LOCAL_STATIC_LIB_PATHS) $(CURRENT_MK) $(LOCAL_DIR)/build.mk
 	$(call print-build-header, $(INTERNAL_TARGET_NAME), CC $(notdir $<))
 	$(MKDIR) $(dir $@)
-	$(eval LIB_INCLUDE_DIRS := $(call get-include-exports-for-libs, $(INTERNAL_LIBS)))
-	$(INTERNAL_CC) -c $(INTERNAL_CFLAGS) $(LIB_INCLUDE_DIRS) -o $@ $< -MMD
+	$(call generate-include-exports-for-target, $(INTERNAL_LIBS))
+	$(call generate-target-db, $(INTERNAL_CXX), $@)
+	$(INTERNAL_CC) -c $(INTERNAL_CFLAGS) $(LIB_INCLUDE_DIRS) -o $@ $< -MMD $(COMP_DB)
 
 $(LOCAL_INTERMEDIATES)/%.o: INTERNAL_TARGET_NAME := $(LOCAL_NAME)
 $(LOCAL_INTERMEDIATES)/%.o: INTERNAL_CXX := $(LOCAL_CXX)
@@ -50,8 +60,9 @@ $(LOCAL_INTERMEDIATES)/%.o: INTERNAL_LIBS := $(LOCAL_LIBS)
 $(LOCAL_INTERMEDIATES)/%.o: %.cpp $(LOCAL_SHARED_LIB_PATHS) $(LOCAL_STATIC_LIB_PATHS) $(CURRENT_MK) $(LOCAL_DIR)/build.mk
 	$(call print-build-header, $(INTERNAL_TARGET_NAME), CXX $(notdir $<))
 	$(MKDIR) $(dir $@)
-	$(eval LIB_INCLUDE_DIRS := $(call get-include-exports-for-libs, $(INTERNAL_LIBS)))
-	$(INTERNAL_CXX) -c $(INTERNAL_CXXFLAGS) $(LIB_INCLUDE_DIRS) -o $@ $< -MMD
+	$(call generate-include-exports-for-target, $(INTERNAL_LIBS))
+	$(call generate-target-db, $(INTERNAL_CXX), $@)
+	$(INTERNAL_CXX) -c $(INTERNAL_CXXFLAGS) $(LIB_INCLUDE_DIRS) -o $@ $< -MMD $(COMP_DB)
 
 $(LOCAL_INTERMEDIATES)/%.o: INTERNAL_TARGET_NAME := $(LOCAL_NAME)
 $(LOCAL_INTERMEDIATES)/%.o: INTERNAL_CXX := $(LOCAL_CXX)
@@ -60,8 +71,9 @@ $(LOCAL_INTERMEDIATES)/%.o: INTERNAL_LIBS := $(LOCAL_LIBS)
 $(LOCAL_INTERMEDIATES)/%.o: %.cc $(LOCAL_SHARED_LIB_PATHS) $(LOCAL_STATIC_LIB_PATHS) $(CURRENT_MK) $(LOCAL_DIR)/build.mk
 	$(call print-build-header, $(INTERNAL_TARGET_NAME), CXX $(notdir $<))
 	$(MKDIR) $(dir $@)
-	$(eval LIB_INCLUDE_DIRS := $(call get-include-exports-for-libs, $(INTERNAL_LIBS)))
-	$(INTERNAL_CXX) -c $(INTERNAL_CXXFLAGS) $(LIB_INCLUDE_DIRS) -o $@ $< -MMD
+	$(call generate-include-exports-for-target, $(INTERNAL_LIBS))
+	$(call generate-target-db, $(INTERNAL_CXX), $@)
+	$(INTERNAL_CXX) -c $(INTERNAL_CXXFLAGS) $(LIB_INCLUDE_DIRS) -o $@ $< -MMD $(COMP_DB)
 
 $(LOCAL_INTERMEDIATES)/%.o: INTERNAL_TARGET_NAME := $(LOCAL_NAME)
 $(LOCAL_INTERMEDIATES)/%.o: INTERNAL_AS := $(LOCAL_AS)
@@ -82,7 +94,7 @@ clean_$(LOCAL_NAME)::
 	rm -f $(INTERNAL_TARGET)
 .PHONY: clean_$(LOCAL_NAME)
 
-all: $(LOCAL_NAME)
+all_targets: $(LOCAL_TARGET)
 
 # Include generated dependencies
 -include $(patsubst %.o, %.d, $(LOCAL_OBJ))

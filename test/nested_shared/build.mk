@@ -1,7 +1,7 @@
 LOCAL_DIR := $(call current-dir)
 
-CC := gcc
-CXX := g++
+CC := clang
+CXX := clang++
 
 include $(CLEAR_VARS)
 LOCAL_NAME := test_nested_shared
