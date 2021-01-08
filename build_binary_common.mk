@@ -32,6 +32,13 @@ ALL_DB_FILES += $(patsubst %.o, %.db, $(LOCAL_CXX_OBJ))
 $(BUILD_COMP_DB_FILE): $(LOCAL_TARGET)
 endif
 
+# Apply compiler profile
+-include $(CONFIG_DIR)/$(LOCAL_COMPILER).mk
+
+LOCAL_CFLAGS += $(LOCAL_COMPILER_CFLAGS)
+LOCAL_CXXFLAGS += $(LOCAL_COMPILER_CXXFLAGS)
+LOCAL_LDFLAGS += $(LOCAL_COMPILER_LDFLAGS)
+
 # Library sources
 LOCAL_SHARED_LIB_PATHS  := $(foreach lib, $(LOCAL_SHARED_LIBS), $(BUILD_LIBS_DIR)/$(lib).so)
 LOCAL_STATIC_LIB_PATHS  := $(foreach lib, $(LOCAL_STATIC_LIBS), $(BUILD_LIBS_DIR)/$(lib).a)
