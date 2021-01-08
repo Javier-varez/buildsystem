@@ -13,6 +13,10 @@ jobs:
     steps:
     - name: checkout
       uses: actions/checkout@v2
+    - name: arm-none-eabi-gcc
+      uses: fiam/arm-none-eabi-gcc@v1.0.3
+      with:
+        release: '9-2020-q2'
     - name: clean
       run: make -C test/ -j clean
     - name: make

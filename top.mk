@@ -1,6 +1,8 @@
 BUILD_SYSTEM_DIR        ?= .
 BUILD_DIR               ?= build
 SYMLINK_COMP_DB         ?= . # Clear this variable if you don't want to generate the symlink
+CONFIG_DIR              := $(BUILD_SYSTEM_DIR)/config
+
 BUILD_TARGET_DIR        := $(BUILD_DIR)/targets
 BUILD_INTERMEDIATES_DIR := $(BUILD_DIR)/intermediates
 BUILD_LIBS_DIR          := $(BUILD_DIR)/lib
