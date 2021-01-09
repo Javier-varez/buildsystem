@@ -22,6 +22,9 @@ LOCAL_CXX               := $(SILENT)$(LOCAL_CROSS_COMPILE)$(CXX)
 LOCAL_AS                := $(SILENT)$(LOCAL_CROSS_COMPILE)$(AS)
 LOCAL_AR                := $(SILENT)$(LOCAL_CROSS_COMPILE)$(AR)
 
+# Apply compiler profile
+-include $(CONFIG_DIR)/$(LOCAL_COMPILER).mk
+
 ifneq ($(findstring clang, $(LOCAL_CC)), )
 ALL_DB_FILES += $(patsubst %.o, %.db, $(LOCAL_C_OBJ))
 $(BUILD_COMP_DB_FILE): $(LOCAL_TARGET)
@@ -31,9 +34,6 @@ ifneq ($(findstring clang, $(LOCAL_CXX)), )
 ALL_DB_FILES += $(patsubst %.o, %.db, $(LOCAL_CXX_OBJ))
 $(BUILD_COMP_DB_FILE): $(LOCAL_TARGET)
 endif
-
-# Apply compiler profile
--include $(CONFIG_DIR)/$(LOCAL_COMPILER).mk
 
 LOCAL_CFLAGS += $(LOCAL_COMPILER_CFLAGS)
 LOCAL_CXXFLAGS += $(LOCAL_COMPILER_CXXFLAGS)
