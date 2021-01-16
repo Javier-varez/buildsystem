@@ -1,7 +1,7 @@
 # ATE Build System
 
 ATE Build system is a non-recursive set of makefile definitions and templates that can be used to simplify the definition of targets. It is based on Make and allows to build the following types of targets:
-  * Binaries
+  * Native binaries
   * Shared libraries
   * Static libraries
 
@@ -16,7 +16,7 @@ A top level makefile system should include the `top.mk` file inside this reposit
 
 #### Top-level makefile example
 
-```
+```Makefile
 BUILD_SYSTEM_DIR := tools/build_system
 include $(BUILD_SYSTEM_DIR)/top.mk
 
@@ -27,13 +27,13 @@ include $(call all-makefiles-under, .)
 
 In order to define targets local variables are used. To ensure that they are empty when defining a new target, we use the following include:
 
-```
+```Makefile
 include $(CLEAR_VARS)
 ```
 
 This will clear all local variables. Then we can define our local variables for the current target. Once we are done, we need to include one of the following three types of targets:
 
-```
+```Makefile
 include $(BUILD_BINARY)
 include $(BUILD_SHARED_LIBRARY)
 include $(BUILD_STATIC_LIBRARY)
@@ -41,7 +41,7 @@ include $(BUILD_STATIC_LIBRARY)
 
 The following is an example of how to define a binary target and link it against a static library:
 
-```
+```Makefile
 LOCAL_DIR := $(call current-dir)
 
 include $(CLEAR_VARS)
@@ -60,9 +60,9 @@ LOCAL_STATIC_LIBS := \
 include $(BUILD_BINARY)
 ```
 
-By defining the `LOCAL_STATIC_LIBS`, all exported headers are automatically included when building the binary. To define the static library we could use the following:
+By defining the `LOCAL_STATIC_LIBS`, all exported header paths are automatically included when building the binary. To define the static library we could use the following:
 
-```
+```Makefile
 LOCAL_DIR := $(call current-dir)
 
 include $(CLEAR_VARS)
@@ -81,9 +81,11 @@ LOCAL_EXPORTED_DIRS := \
 include $(BUILD_STATIC_LIB)
 ```
 
-`LOCAL_EXPORTED_DIRS` is used to define the exported headers for the library. These are the ones that will get included when building binaries that link against this library. More than one origin can be specified, but no two files with the same name shall be found.
+`LOCAL_EXPORTED_DIRS` is used to define the exported headers for the library. These are the ones that will get included when building binaries that link against this library. More than one path can be specified. All exported directories are included in the targets that link against this library.
 
-### Known limitations
+### Compiler profiles
 
-Currently the main limitation is:
-  * Libraries cannot be automatically linked and included by other libraries. This means that the `LOCAL_STATIC_LIBS` and `LOCAL_SHARED_LIBS` variables are only used when building binaries.
+ATE Build System supports custom compiler profiles. These are complex predefined compiler configurations that can be applied for each target. Currently it supports:
+
+  * `arm_clang`: Uses `clang` with the `arm-none-eabi` triplet. In addition, it uses the sysroot from the `arm-none-eabi-gcc` toolchain, which is automatically detected from the `arm-none-eabi-gcc` binary present in your PATH environment variable. Links against `libc_nano` and `libstdc++_nano`. Uses the `-nostdlib` linker flag.
+
