@@ -1,3 +1,23 @@
+## Builds a native binary
+#   LOCAL_NAME          := Name of the target
+#   LOCAL_SRC           := Source file paths relative to the top of the tree
+#   LOCAL_CFLAGS        := Flags passed to the C compiler
+#   LOCAL_CXXFLAGS      := Flags passed to the C++ compiler
+#   LOCAL_LDFLAGS       := Flags passed to the linker
+#   LOCAL_ASFLAGS       := Flags for the assembler
+#   LOCAL_LINKER_FILE   := Path to the linker script
+#   LOCAL_SHARED_LIBS   := Shared libraries to link
+#   LOCAL_STATIC_LIBS   := Static libraries to link
+#   LOCAL_COMPILER      := Compiler profile to apply for this build.
+#                          Overrides the CC, CXX and AS variables.
+#                          Profiles are available under config/
+#   SKIP_MAP_GEN        := Skips map file generation if it is true
+#   LOCAL_CROSS_COMPILE := Sets the cross compiler prefix for the current toolchain
+#                          Example: arm-none-eabi-
+#   CC                  := C Compiler
+#   CXX                 := C++ Compiler. Used as linker too
+#   AS                  := Assembler.
+
 CURRENT_MK              := $(lastword $(MAKEFILE_LIST))
 LOCAL_TARGET            := $(BUILD_TARGET_DIR)/$(LOCAL_NAME)
 LOCAL_LDFLAGS           += $(addprefix -T, $(LOCAL_LINKER_FILE))
