@@ -11,18 +11,27 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: checkout
+    - name: Checkout repo
       uses: actions/checkout@v2
-    - name: arm-none-eabi-gcc
+    - name: Install arm-none-eabi-gcc
       uses: fiam/arm-none-eabi-gcc@v1.0.3
       with:
         release: '9-2020-q2'
-    - name: clean
+    - name: Install bear
+      run: sudo apt install bear
+    - name: Clean
       run: make -C test/ -j clean
-    - name: make
+    - name: Run make
       run: make -C test/ -j
-    - name: run_binary
+    - name: Run binary
       run: ./test/build/targets/test_binary
       env:
         LD_LIBRARY_PATH: "test/build/lib"
+
+  python_lint:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: GitHub Action for pylint
+      uses: cclauss/GitHub-Action-for-pylint@0.7.0
 

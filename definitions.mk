@@ -21,10 +21,10 @@ define generate-include-exports-for-target
 $(eval LIB_INCLUDE_DIRS := $(foreach LIB_TARGET_NAME, $(1), $(addprefix -I, $(TARGET_$(LIB_TARGET_NAME)_EXPORT_DIRS))))
 endef
 
-# Generates the target partial compilation database (-MJ option) when using clang.
-# Updates the COMP_DB variable.
-# $(1): selected compiler
-# $(2): current target
-define generate-target-db
-$(eval COMP_DB := $(if $(findstring clang, $(1)), -MJ $(patsubst %.o, %.db, $(2)), ))
+define trace-c-build
+$(BEAR) --use-cc $(INTERNAL_CC) --cdb $(patsubst %.o, %.db, $(1)) bash -c "$(2)"
+endef
+
+define trace-c++-build
+$(BEAR) --use-c++ $(INTERNAL_CXX) --cdb $(patsubst %.o, %.db, $(1)) bash -c "$(2)"
 endef
