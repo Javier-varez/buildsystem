@@ -5,7 +5,6 @@
 #   LOCAL_CXXFLAGS      := Flags passed to the C++ compiler
 #   LOCAL_ARFLAGS       := Flags passed to the archiver
 #   LOCAL_ASFLAGS       := Flags for the assembler
-#   LOCAL_LINKER_FILE   := Path to the linker script
 #   LOCAL_SHARED_LIBS   := Shared libraries to link
 #   LOCAL_STATIC_LIBS   := Static libraries to link
 #   LOCAL_COMPILER      := Compiler profile to apply for this build.
@@ -15,7 +14,6 @@
 #                          The header files under these directories will
 #                          be available for targets that links against the
 #                          library.
-#   SKIP_MAP_GEN        := Skips map file generation if it is true
 #   LOCAL_CROSS_COMPILE := Sets the cross compiler prefix for the current toolchain
 #                          Example: arm-none-eabi-
 #   CC                  := C Compiler
