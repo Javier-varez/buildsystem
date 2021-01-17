@@ -23,6 +23,8 @@ MKDIR                   := $(SILENT)mkdir -p
 ECHO                    := $(SILENT)echo
 RM                      := $(SILENT)rm
 CP                      := $(SILENT)cp
+BEAR                    := $(SILENT)bear
+MERGE_COMPDB            := $(SILENT)$(BUILD_SYSTEM_DIR)/merge_compdb.py
 
 ALL_DB_FILES            :=
 
@@ -39,7 +41,7 @@ compdb: $(BUILD_COMP_DB_FILE)
 # Merge partial compilation database files
 $(BUILD_COMP_DB_FILE):
 	$(call print-build-header, COMP_DB,)
-	$(if $(ALL_DB_FILES), $(shell sed -e '1s/^/[\n/' -e '$$s/,$$/\n]/' $(ALL_DB_FILES) > $@))
+	$(MERGE_COMPDB) --output $@ --files $(ALL_DB_FILES)
 	$(if $(SYMLINK_COMP_DB), $(shell ln -s -f $@ $(addsuffix /compile_commands.json, $(SYMLINK_COMP_DB))))
 
 clean:

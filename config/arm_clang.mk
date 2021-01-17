@@ -13,8 +13,8 @@
 ARM_GCC_SYSROOT ?= $(shell arm-none-eabi-gcc -print-sysroot)
 ARM_GCC_VERSION ?= $(shell arm-none-eabi-gcc --version | head -n1 | cut -d ' ' -f 7)
 
-LOCAL_CC := $(SILENT)clang
-LOCAL_CXX := $(SILENT)clang++
+LOCAL_CC := clang
+LOCAL_CXX := clang++
 
 ifeq ($(LOCAL_ARM_ARCHITECTURE),)
 	LOCAL_ARM_ARCHITECTURE := v6-m
