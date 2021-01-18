@@ -4,6 +4,7 @@ SYMLINK_COMP_DB         ?= . # Clear this variable if you don't want to generate
 CONFIG_DIR              := $(BUILD_SYSTEM_DIR)/config
 
 BUILD_TARGET_DIR        := $(BUILD_DIR)/targets
+BUILD_TEST_DIR          := $(BUILD_DIR)/tests
 BUILD_INTERMEDIATES_DIR := $(BUILD_DIR)/intermediates
 BUILD_LIBS_DIR          := $(BUILD_DIR)/lib
 BUILD_COMP_DB_FILE      := $(BUILD_DIR)/compile_commands.json
@@ -11,6 +12,7 @@ BUILD_COMP_DB_FILE      := $(BUILD_DIR)/compile_commands.json
 BUILD_BINARY            := $(BUILD_SYSTEM_DIR)/build_binary.mk
 BUILD_SHARED_LIB        := $(BUILD_SYSTEM_DIR)/build_shared_lib.mk
 BUILD_STATIC_LIB        := $(BUILD_SYSTEM_DIR)/build_static_lib.mk
+BUILD_HOST_TEST         := $(BUILD_SYSTEM_DIR)/build_host_test.mk
 CLEAR_VARS              := $(BUILD_SYSTEM_DIR)/clear_vars.mk
 
 GREEN_BOLD_COLOR        := \e[32;1m
@@ -32,8 +34,16 @@ ALL_DB_FILES            :=
 all: compdb all_targets
 .PHONY: all
 
+# Builds all targets
 all_targets:
 .PHONY: all_targets
+
+# Runs all tests
+run_tests:
+.PHONY: run_tests
+
+tests:
+.PHONY: tests
 
 compdb: $(BUILD_COMP_DB_FILE)
 .PHONY: compdb
@@ -47,3 +57,5 @@ $(BUILD_COMP_DB_FILE):
 clean:
 	$(ECHO) "Removing build directory"
 	$(RM) -rf $(BUILD_DIR)
+
+include $(BUILD_SYSTEM_DIR)/googletest.mk

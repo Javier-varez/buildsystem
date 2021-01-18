@@ -13,6 +13,8 @@ jobs:
     steps:
     - name: Checkout repo
       uses: actions/checkout@v2
+      with:
+        submodules: 'true'
     - name: Install arm-none-eabi-gcc
       uses: fiam/arm-none-eabi-gcc@v1.0.3
       with:
@@ -20,13 +22,13 @@ jobs:
     - name: Install bear
       run: sudo apt install bear
     - name: Clean
-      run: make -C test/ -j clean
+      run: make -j clean
     - name: Run make
-      run: make -C test/ -j
+      run: make -j
     - name: Run binary
-      run: ./test/build/targets/test_binary
-      env:
-        LD_LIBRARY_PATH: "test/build/lib"
+      run: make run_test_binary
+    - name: Run tests
+      run: make run_tests
 
   python_lint:
     runs-on: ubuntu-latest
