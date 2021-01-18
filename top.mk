@@ -31,7 +31,7 @@ MERGE_COMPDB            := $(SILENT)$(BUILD_SYSTEM_DIR)/merge_compdb.py
 ALL_DB_FILES            :=
 
 #default rule, don't move
-all: compdb all_targets
+all: all_targets
 .PHONY: all
 
 # Builds all targets
