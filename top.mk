@@ -51,11 +51,13 @@ compdb: $(BUILD_COMP_DB_FILE)
 # Merge partial compilation database files
 $(BUILD_COMP_DB_FILE):
 	$(call print-build-header, COMP_DB,)
-	$(MERGE_COMPDB) --output $@ --files $(ALL_DB_FILES)
+	$(MERGE_COMPDB) --output $@ --files $^
 	$(if $(SYMLINK_COMP_DB), $(shell ln -s -f $@ $(addsuffix /compile_commands.json, $(SYMLINK_COMP_DB))))
 
 clean:
 	$(ECHO) "Removing build directory"
 	$(RM) -rf $(BUILD_DIR)
+
+%.db: %.o ;
 
 include $(BUILD_SYSTEM_DIR)/googletest.mk

@@ -25,9 +25,10 @@ LOCAL_AR                := $(LOCAL_CROSS_COMPILE)$(AR)
 # Apply compiler profile
 -include $(CONFIG_DIR)/$(LOCAL_COMPILER).mk
 
-ALL_DB_FILES += $(patsubst %.o, %.db, $(LOCAL_C_OBJ))
-ALL_DB_FILES += $(patsubst %.o, %.db, $(LOCAL_CXX_OBJ))
-$(BUILD_COMP_DB_FILE): $(LOCAL_TARGET)
+LOCAL_DB_FILES := $(patsubst %.o, %.db, $(LOCAL_C_OBJ)) \
+                  $(patsubst %.o, %.db, $(LOCAL_CXX_OBJ))
+ALL_DB_FILES += $(LOCAL_DB_FILES)
+$(BUILD_COMP_DB_FILE): $(LOCAL_DB_FILES)
 
 LOCAL_CFLAGS += $(LOCAL_COMPILER_CFLAGS)
 LOCAL_CXXFLAGS += $(LOCAL_COMPILER_CXXFLAGS)
