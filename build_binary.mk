@@ -21,7 +21,8 @@
 CURRENT_MK              := $(lastword $(MAKEFILE_LIST))
 PARENT_MK               := $(lastword $(filter-out $(CURRENT_MK), $(MAKEFILE_LIST)))
 LOCAL_TARGET            := $(BUILD_TARGET_DIR)/$(LOCAL_NAME)
-LOCAL_LDFLAGS           += $(addprefix -T, $(LOCAL_LINKER_FILE))
+LD_LINKER_SCRIPT_OPT    := -Wl,-T
+LOCAL_LDFLAGS           += $(addprefix $(LD_LINKER_SCRIPT_OPT), $(LOCAL_LINKER_FILE))
 ifneq ($(SKIP_MAP_GEN),true)
 LOCAL_LDFLAGS           += -Wl,-Map=$(LOCAL_TARGET).map
 endif
