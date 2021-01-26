@@ -20,6 +20,7 @@
 #   CXX                 := C++ Compiler. Used as linker too
 #   AS                  := Assembler.
 #   AR                  := Archiver.
+#   LOCAL_LINKER_FILE   := Path to the linker script
 
 CURRENT_MK              := $(lastword $(MAKEFILE_LIST))
 PARENT_MK               := $(lastword $(filter-out $(CURRENT_MK), $(MAKEFILE_LIST)))
@@ -30,11 +31,20 @@ LOCAL_TARGET            := $(BUILD_LIBS_DIR)/$(LOCAL_NAME).a
 include $(BUILD_SYSTEM_DIR)/build_binary_common.mk
 include $(BUILD_SYSTEM_DIR)/build_library_common.mk
 
+LINKER_SCRIPT_TARGETS    := $(addprefix $(BUILD_LINKER_SCRIPT_DIR)/$(LOCAL_NAME)/, $(LOCAL_LINKER_FILE))
+TARGET_$(LOCAL_NAME)_LINKER_SCRIPT := $(LINKER_SCRIPT_TARGETS)
+
+$(BUILD_LINKER_SCRIPT_DIR)/$(LOCAL_NAME)/%.ld: INTERNAL_TARGET_NAME := $(LOCAL_NAME)
+$(BUILD_LINKER_SCRIPT_DIR)/$(LOCAL_NAME)/%.ld: %.ld
+	$(call print-build-header, $(INTERNAL_TARGET_NAME), LINKER_SCRIPT $<)
+	$(MKDIR) $(dir $@)
+	$(CP) $< $@
+
 $(LOCAL_TARGET): INTERNAL_TARGET_NAME := $(LOCAL_NAME)
 $(LOCAL_TARGET): INTERNAL_AR := $(LOCAL_AR)
 $(LOCAL_TARGET): INTERNAL_ARFLAGS := $(LOCAL_ARFLAGS)
 $(LOCAL_TARGET): INTERNAL_OBJ := $(LOCAL_OBJ)
-$(LOCAL_TARGET): $(LOCAL_OBJ) $(LOCAL_STATIC_LIB_PATHS) $(LOCAL_SHARED_LIB_PATHS) $(LOCAL_TARGET_EXPORTS) $(CURRENT_MK) $(PARENT_MK)
+$(LOCAL_TARGET): $(LOCAL_OBJ) $(LOCAL_STATIC_LIB_PATHS) $(LOCAL_SHARED_LIB_PATHS) $(LOCAL_TARGET_EXPORTS) $(CURRENT_MK) $(PARENT_MK) $(LINKER_SCRIPT_TARGETS)
 	$(call print-build-header, $(INTERNAL_TARGET_NAME), AR)
 	$(MKDIR) $(dir $@)
 	$(SILENT)$(INTERNAL_AR) $(INTERNAL_ARFLAGS) $@ $(INTERNAL_OBJ) $(LOCAL_STATIC_LIB_PATHS)

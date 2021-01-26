@@ -28,3 +28,9 @@ endef
 define trace-c++-build
 $(BEAR) --use-c++ $(INTERNAL_CXX) --cdb $(patsubst %.o, %.db, $(1)) bash -c "$(2)"
 endef
+
+# Gets the extra linker flags from the internally linked libraries
+# $(1): Libraries to link agains (name)
+define get-extra-ldflags
+$(eval EXTRA_LDFLAGS := $(addprefix $(LD_LINKER_SCRIPT_OPT), $(foreach LIB, $(1), $(TARGET_$(LIB)_LINKER_SCRIPT))))
+endef
