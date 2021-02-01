@@ -12,6 +12,7 @@
 #   CC                  := C Compiler
 #   CXX                 := C++ Compiler. Used as linker too
 #   AS                  := Assembler.
+#   LOCAL_PREREQUISITES := Additional dependencies
 
 CURRENT_MK              := $(lastword $(MAKEFILE_LIST))
 PARENT_MK               := $(lastword $(filter-out $(CURRENT_MK), $(MAKEFILE_LIST)))
@@ -34,7 +35,7 @@ $(LOCAL_TARGET): INTERNAL_CXXFLAGS := $(LOCAL_CXXFLAGS)
 $(LOCAL_TARGET): INTERNAL_LDFLAGS := $(LOCAL_LDFLAGS)
 $(LOCAL_TARGET): INTERNAL_TARGET_NAME := $(LOCAL_NAME)
 $(LOCAL_TARGET): INTERNAL_OBJ := $(LOCAL_OBJ)
-$(LOCAL_TARGET): $(LOCAL_OBJ) $(LOCAL_SHARED_LIB_PATHS) $(LOCAL_STATIC_LIB_PATHS) $(CURRENT_MK) $(PARENT_MK) $(LOCAL_LINKER_FILE)
+$(LOCAL_TARGET): $(LOCAL_OBJ) $(LOCAL_SHARED_LIB_PATHS) $(LOCAL_STATIC_LIB_PATHS) $(CURRENT_MK) $(PARENT_MK) $(LOCAL_LINKER_FILE) $(LOCAL_PREREQUISITES)
 	$(call print-build-header, $(INTERNAL_TARGET_NAME), LD)
 	$(MKDIR) $(dir $@)
 	$(SILENT)$(INTERNAL_CXX) $(INTERNAL_CXXFLAGS) -o $@ $(INTERNAL_OBJ) $(INTERNAL_LDFLAGS)
