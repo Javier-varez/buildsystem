@@ -7,6 +7,8 @@
 #   LOCAL_ASFLAGS       := Flags for the assembler
 #   LOCAL_SHARED_LIBS   := Shared libraries to link
 #   LOCAL_STATIC_LIBS   := Static libraries to link
+#   LOCAL_MULTILIB      := Set it to 32 to build a 32 bit test. 
+#                          By default it will use 64 bit.
 #   CC                  := C Compiler
 #   CXX                 := C++ Compiler. Used as linker too
 #   AS                  := Assembler.
@@ -16,7 +18,13 @@ PARENT_MK               := $(lastword $(filter-out $(CURRENT_MK), $(MAKEFILE_LIS
 LOCAL_TARGET            := $(BUILD_TEST_DIR)/$(LOCAL_NAME)
 LOCAL_LDFLAGS           += $(addprefix -T, $(LOCAL_LINKER_FILE))
 
+ifeq ($(LOCAL_MULTILIB),32)
+LOCAL_CFLAGS += -m32
+LOCAL_CXXFLAGS += -m32
+LOCAL_STATIC_LIBS       += libgmock_main32 libgmock32
+else
 LOCAL_STATIC_LIBS       += libgmock_main libgmock
+endif
 LOCAL_LDFLAGS           += -pthread
 
 include $(BUILD_SYSTEM_DIR)/build_binary_common.mk
