@@ -24,6 +24,13 @@ LOCAL_ARFLAGS := \
 	-rcs
 include $(BUILD_STATIC_LIB)
 
+# Let's define also a 32-bit version target
+LOCAL_NAME := gmock32
+LOCAL_CFLAGS += -m32
+LOCAL_CXXFLAGS += -m32
+
+include $(BUILD_STATIC_LIB)
+
 include $(CLEAR_VARS)
 LOCAL_NAME := gmock_main
 LOCAL_CFLAGS := \
@@ -43,3 +50,11 @@ LOCAL_SRC := \
 LOCAL_ARFLAGS := \
 	-rcs
 include $(BUILD_STATIC_LIB)
+
+# Let's define also a 32-bit version target
+LOCAL_NAME := gmock_main32
+LOCAL_CFLAGS += -m32
+LOCAL_CXXFLAGS += -m32
+
+include $(BUILD_STATIC_LIB)
+
