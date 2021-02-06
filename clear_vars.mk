@@ -42,3 +42,5 @@ LOCAL_ARM_FPU           :=
 LOCAL_DB_FILES          :=
 LOCAL_MULTILIB          :=
 LOCAL_PREREQUISITES     :=
+LOCAL_RISCV_ARCH        :=
+LOCAL_RISCV_ABI         :=
