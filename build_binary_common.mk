@@ -2,6 +2,9 @@ CURRENT_MK              += $(lastword $(MAKEFILE_LIST))
 
 LOCAL_INTERMEDIATES     := $(BUILD_INTERMEDIATES_DIR)/$(LOCAL_NAME)
 
+LOCAL_SRC               += $(LOCAL_GENERATED_SOURCES)
+LOCAL_PREREQUISITES     += $(LOCAL_GENERATED_SOURCES)
+
 # Sources
 LOCAL_C_SRC             := $(filter %.c, $(LOCAL_SRC))
 LOCAL_CXX_SRC           := $(filter %.cpp %.cc, $(LOCAL_SRC))
@@ -33,6 +36,10 @@ $(BUILD_COMP_DB_FILE): $(LOCAL_DB_FILES)
 LOCAL_CFLAGS += $(LOCAL_COMPILER_CFLAGS)
 LOCAL_CXXFLAGS += $(LOCAL_COMPILER_CXXFLAGS)
 LOCAL_LDFLAGS += $(LOCAL_COMPILER_LDFLAGS)
+
+# Add generated sources dir to includes
+LOCAL_CFLAGS += -I$(local-generated-sources-dir)
+LOCAL_CXXFLAGS += -I$(local-generated-sources-dir)
 
 # Library sources
 LOCAL_SHARED_LIB_PATHS  := $(foreach lib, $(LOCAL_SHARED_LIBS), $(BUILD_LIBS_DIR)/$(lib).so)

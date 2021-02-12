@@ -6,6 +6,7 @@ CONFIG_DIR              := $(BUILD_SYSTEM_DIR)/config
 BUILD_TARGET_DIR        := $(BUILD_DIR)/targets
 BUILD_TEST_DIR          := $(BUILD_DIR)/tests
 BUILD_INTERMEDIATES_DIR := $(BUILD_DIR)/intermediates
+BUILD_GENERATED_SRC_DIR := $(BUILD_DIR)/gensrcs
 BUILD_LIBS_DIR          := $(BUILD_DIR)/lib
 BUILD_LINKER_SCRIPT_DIR := $(BUILD_DIR)/linker_script
 BUILD_COMP_DB_FILE      := $(BUILD_DIR)/compile_commands.json

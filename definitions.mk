@@ -34,3 +34,16 @@ endef
 define get-extra-ldflags
 $(eval EXTRA_LDFLAGS := $(addprefix $(LD_LINKER_SCRIPT_OPT), $(foreach LIB, $(1), $(TARGET_$(LIB)_LINKER_SCRIPT))))
 endef
+
+###########################################################
+## Stuff source generated from one-off tools
+###########################################################
+define transform-generated-source
+$(call print-build-header, $(INTERNAL_NAME), GEN_SRC $@)
+$(MKDIR) $(dir $@)
+$(SILENT) $(INTERNAL_CUSTOM_TOOL)
+endef
+
+define local-generated-sources-dir
+$(BUILD_GENERATED_SRC_DIR)/$(LOCAL_NAME)
+endef
