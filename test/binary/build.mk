@@ -14,5 +14,19 @@ LOCAL_SRC := \
 
 LOCAL_SHARED_LIBS := libtest_nested_shared libtest_shared
 LOCAL_STATIC_LIBS := libtest_static
+
+gen_srcs_dir := $(local-generated-sources-dir)
+
+GEN := $(gen_srcs_dir)/custom_source.h
+
+$(GEN) : INTERNAL_NAME := $(LOCAL_NAME)
+$(GEN) : INTERNAL_DIR := $(LOCAL_DIR)
+$(GEN) : INTERNAL_FILE := $(LOCAL_DIR)/pre_processed.h
+$(GEN) : INTERNAL_GEN  := $(GEN)
+$(GEN) : INTERNAL_CUSTOM_TOOL := cp $(INTERNAL_FILE) $(INTERNAL_GEN)
+$(GEN) : $(LOCAL_DIR)/pre_processed.h
+	$(transform-generated-source)
+
+LOCAL_GENERATED_SOURCES := $(GEN)
 include $(BUILD_BINARY)
 
