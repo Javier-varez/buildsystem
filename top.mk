@@ -62,4 +62,4 @@ clean:
 
 %.db: %.o ;
 
-include $(BUILD_SYSTEM_DIR)/googletest.mk
+include $(BUILD_SYSTEM_DIR)/gtest/build.mk
