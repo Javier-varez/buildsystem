@@ -7,16 +7,18 @@ LOCAL_PREREQUISITES     += $(LOCAL_GENERATED_SOURCES)
 
 # Sources
 LOCAL_C_SRC             := $(filter %.c, $(LOCAL_SRC))
-LOCAL_CXX_SRC           := $(filter %.cpp %.cc, $(LOCAL_SRC))
+LOCAL_CXX_SRC           := $(filter %.cpp, $(LOCAL_SRC))
+LOCAL_CC_SRC            := $(filter %.cc, $(LOCAL_SRC))
 LOCAL_S_SRC             := $(filter %.s, $(LOCAL_SRC))
 
 # Objects
 LOCAL_C_OBJ             := $(addprefix $(LOCAL_INTERMEDIATES)/, $(patsubst %.c, %.o, $(LOCAL_C_SRC)))
-LOCAL_CXX_OBJ           := $(addprefix $(LOCAL_INTERMEDIATES)/, $(patsubst %.cpp, %.o, $(filter %.cpp, $(LOCAL_CXX_SRC))))
-LOCAL_CXX_OBJ           += $(addprefix $(LOCAL_INTERMEDIATES)/, $(patsubst %.cc, %.o, $(filter %.cc, $(LOCAL_CXX_SRC))))
+LOCAL_CXX_OBJ           := $(addprefix $(LOCAL_INTERMEDIATES)/, $(patsubst %.cpp, %.o, $(LOCAL_CXX_SRC)))
+LOCAL_CC_OBJ            := $(addprefix $(LOCAL_INTERMEDIATES)/, $(patsubst %.cc, %.o, $(LOCAL_CC_SRC)))
 LOCAL_S_OBJ             := $(addprefix $(LOCAL_INTERMEDIATES)/, $(patsubst %.s, %.o, $(LOCAL_S_SRC)))
 LOCAL_OBJ               := $(LOCAL_C_OBJ) \
                            $(LOCAL_CXX_OBJ) \
+                           $(LOCAL_CC_OBJ) \
                            $(LOCAL_S_OBJ)
 
 # Toolchain binaries
@@ -29,7 +31,8 @@ LOCAL_AR                := $(LOCAL_CROSS_COMPILE)$(AR)
 -include $(CONFIG_DIR)/$(LOCAL_COMPILER).mk
 
 LOCAL_DB_FILES := $(patsubst %.o, %.db, $(LOCAL_C_OBJ)) \
-                  $(patsubst %.o, %.db, $(LOCAL_CXX_OBJ))
+                  $(patsubst %.o, %.db, $(LOCAL_CXX_OBJ)) \
+                  $(patsubst %.o, %.db, $(LOCAL_CC_OBJ))
 ALL_DB_FILES += $(LOCAL_DB_FILES)
 $(BUILD_COMP_DB_FILE): $(LOCAL_DB_FILES)
 
@@ -51,40 +54,40 @@ LOCAL_LDFLAGS           := $(addprefix -L, $(patsubst %/, %, $(dir $(LOCAL_SHARE
 			   $(LOCAL_LDFLAGS)
 
 # Rules
-$(LOCAL_INTERMEDIATES)/%.o: INTERNAL_TARGET_NAME := $(LOCAL_NAME)
-$(LOCAL_INTERMEDIATES)/%.o: INTERNAL_CC := $(LOCAL_CC)
-$(LOCAL_INTERMEDIATES)/%.o: INTERNAL_CFLAGS := $(LOCAL_CFLAGS)
-$(LOCAL_INTERMEDIATES)/%.o: INTERNAL_LIBS := $(LOCAL_LIBS)
-$(LOCAL_INTERMEDIATES)/%.o: %.c $(LOCAL_SHARED_LIB_PATHS) $(LOCAL_STATIC_LIB_PATHS) $(MK_DEPS) $(LOCAL_PREREQUISITES)
+$(LOCAL_C_OBJ): INTERNAL_TARGET_NAME := $(LOCAL_NAME)
+$(LOCAL_C_OBJ): INTERNAL_CC := $(LOCAL_CC)
+$(LOCAL_C_OBJ): INTERNAL_CFLAGS := $(LOCAL_CFLAGS)
+$(LOCAL_C_OBJ): INTERNAL_LIBS := $(LOCAL_LIBS)
+$(LOCAL_C_OBJ): $(LOCAL_INTERMEDIATES)/%.o: %.c $(LOCAL_SHARED_LIB_PATHS) $(LOCAL_STATIC_LIB_PATHS) $(MK_DEPS) $(LOCAL_PREREQUISITES)
 	$(call print-build-header, $(INTERNAL_TARGET_NAME), CC $(notdir $<))
 	$(MKDIR) $(dir $@)
 	$(call generate-include-exports-for-target, $(INTERNAL_LIBS))
 	$(call trace-c-build, $@, $(INTERNAL_CC) -c $(INTERNAL_CFLAGS) $(LIB_INCLUDE_DIRS) -o $@ $< -MMD)
 
-$(LOCAL_INTERMEDIATES)/%.o: INTERNAL_TARGET_NAME := $(LOCAL_NAME)
-$(LOCAL_INTERMEDIATES)/%.o: INTERNAL_CXX := $(LOCAL_CXX)
-$(LOCAL_INTERMEDIATES)/%.o: INTERNAL_CXXFLAGS := $(LOCAL_CXXFLAGS)
-$(LOCAL_INTERMEDIATES)/%.o: INTERNAL_LIBS := $(LOCAL_LIBS)
-$(LOCAL_INTERMEDIATES)/%.o: %.cpp $(LOCAL_SHARED_LIB_PATHS) $(LOCAL_STATIC_LIB_PATHS) $(MK_DEPS) $(LOCAL_PREREQUISITES)
+$(LOCAL_CXX_OBJ): INTERNAL_TARGET_NAME := $(LOCAL_NAME)
+$(LOCAL_CXX_OBJ): INTERNAL_CXX := $(LOCAL_CXX)
+$(LOCAL_CXX_OBJ): INTERNAL_CXXFLAGS := $(LOCAL_CXXFLAGS)
+$(LOCAL_CXX_OBJ): INTERNAL_LIBS := $(LOCAL_LIBS)
+$(LOCAL_CXX_OBJ): $(LOCAL_INTERMEDIATES)/%.o: %.cpp $(LOCAL_SHARED_LIB_PATHS) $(LOCAL_STATIC_LIB_PATHS) $(MK_DEPS) $(LOCAL_PREREQUISITES)
 	$(call print-build-header, $(INTERNAL_TARGET_NAME), CXX $(notdir $<))
 	$(MKDIR) $(dir $@)
 	$(call generate-include-exports-for-target, $(INTERNAL_LIBS))
 	$(call trace-c++-build, $@, $(INTERNAL_CXX) -c $(INTERNAL_CXXFLAGS) $(LIB_INCLUDE_DIRS) -o $@ $< -MMD)
 
-$(LOCAL_INTERMEDIATES)/%.o: INTERNAL_TARGET_NAME := $(LOCAL_NAME)
-$(LOCAL_INTERMEDIATES)/%.o: INTERNAL_CXX := $(LOCAL_CXX)
-$(LOCAL_INTERMEDIATES)/%.o: INTERNAL_CXXFLAGS := $(LOCAL_CXXFLAGS)
-$(LOCAL_INTERMEDIATES)/%.o: INTERNAL_LIBS := $(LOCAL_LIBS)
-$(LOCAL_INTERMEDIATES)/%.o: %.cc $(LOCAL_SHARED_LIB_PATHS) $(LOCAL_STATIC_LIB_PATHS) $(MK_DEPS) $(LOCAL_PREREQUISITES)
+$(LOCAL_CC_OBJ): INTERNAL_TARGET_NAME := $(LOCAL_NAME)
+$(LOCAL_CC_OBJ): INTERNAL_CXX := $(LOCAL_CXX)
+$(LOCAL_CC_OBJ): INTERNAL_CXXFLAGS := $(LOCAL_CXXFLAGS)
+$(LOCAL_CC_OBJ): INTERNAL_LIBS := $(LOCAL_LIBS)
+$(LOCAL_CC_OBJ): $(LOCAL_INTERMEDIATES)/%.o: %.cc $(LOCAL_SHARED_LIB_PATHS) $(LOCAL_STATIC_LIB_PATHS) $(MK_DEPS) $(LOCAL_PREREQUISITES)
 	$(call print-build-header, $(INTERNAL_TARGET_NAME), CXX $(notdir $<))
 	$(MKDIR) $(dir $@)
 	$(call generate-include-exports-for-target, $(INTERNAL_LIBS))
 	$(call trace-c++-build, $@, $(INTERNAL_CXX) -c $(INTERNAL_CXXFLAGS) $(LIB_INCLUDE_DIRS) -o $@ $< -MMD)
 
-$(LOCAL_INTERMEDIATES)/%.o: INTERNAL_TARGET_NAME := $(LOCAL_NAME)
-$(LOCAL_INTERMEDIATES)/%.o: INTERNAL_AS := $(LOCAL_AS)
-$(LOCAL_INTERMEDIATES)/%.o: INTERNAL_ASFLAGS := $(LOCAL_ASFLAGS)
-$(LOCAL_INTERMEDIATES)/%.o: %.s $(LOCAL_SHARED_LIB_PATHS) $(LOCAL_STATIC_LIB_PATHS) $(MK_DEPS) $(LOCAL_PREREQUISITES)
+$(LOCAL_S_OBJ): INTERNAL_TARGET_NAME := $(LOCAL_NAME)
+$(LOCAL_S_OBJ): INTERNAL_AS := $(LOCAL_AS)
+$(LOCAL_S_OBJ): INTERNAL_ASFLAGS := $(LOCAL_ASFLAGS)
+$(LOCAL_S_OBJ): $(LOCAL_INTERMEDIATES)/%.o: %.s $(LOCAL_SHARED_LIB_PATHS) $(LOCAL_STATIC_LIB_PATHS) $(MK_DEPS) $(LOCAL_PREREQUISITES)
 	$(call print-build-header, $(INTERNAL_TARGET_NAME), AS $(notdir $<))
 	$(MKDIR) $(dir $@)
 	$(INTERNAL_AS) -c $(INTERNAL_ASFLAGS) -o $@ $< -MMD
