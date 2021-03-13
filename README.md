@@ -9,10 +9,10 @@ Its design was inspired by the AOSP build system, although it is much lighter an
 
 ### Dependencies
 
-In addition to `GNU make`, you will need also `Python 3` and `bear`.
+In addition to `GNU make`, you will need also `Python 3`.
 
 ```bash
-sudo apt install make python3 bear
+sudo apt install make python3
 ```
 
 ### Using the build system
