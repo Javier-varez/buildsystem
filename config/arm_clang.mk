@@ -26,9 +26,9 @@ endif
 
 LOCAL_COMPILER_CFLAGS := \
     --target=arm-none-eabi \
-    --sysroot=$(ARM_GCC_SYSROOT) \
     -I$(ARM_GCC_SYSROOT)/include/c++/$(ARM_GCC_VERSION) \
-    -I$(ARM_GCC_SYSROOT)/include/c++/$(ARM_GCC_VERSION)/arm-none-eabi/thumb/$(LOCAL_ARM_ARCHITECTURE)/$(LOCAL_ARM_FPU)/
+    -I$(ARM_GCC_SYSROOT)/include/c++/$(ARM_GCC_VERSION)/arm-none-eabi/thumb/$(LOCAL_ARM_ARCHITECTURE)/$(LOCAL_ARM_FPU)/ \
+    -I$(ARM_GCC_SYSROOT)/include
 
 LOCAL_COMPILER_CXXFLAGS := $(LOCAL_COMPILER_CFLAGS)
 
